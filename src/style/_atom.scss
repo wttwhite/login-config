@@ -1,0 +1,34 @@
+.full {
+  width: 100%;
+  height: 100%;
+}
+
+.full-w {
+  width: 100%;
+}
+
+.full-h {
+  height: 100%;
+}
+
+.ovh {
+  overflow: hidden;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pdc16 {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+.pdc8 {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.pdh8 {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
