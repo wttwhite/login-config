@@ -34,7 +34,7 @@ export default {
   watch: {
     form: {
       handler(n) {
-        this.$store.commit('changePageInfo', n)
+        this.$emit('update-pageInfo', n)
       },
       deep: true,
     },
@@ -50,7 +50,6 @@ export default {
     }
   },
   mounted() {
-    console.log('this.$attrsthis.$attrsthis.$attrs', this.$attrs)
     this.form.pageName = this.$attrs.pageInfo.pageName
   },
   methods: {},

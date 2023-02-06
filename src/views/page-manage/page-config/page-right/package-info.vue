@@ -1,7 +1,7 @@
 <template>
   <div>
     <section class="pdc16">
-      <h3>{{ changeForm.currentPackageInfo.package?.cn_name }}</h3>
+      <h3>{{ $attrs.packageInfo.package?.cn_name }}</h3>
       <div class="pdh8">组件尺寸</div>
       <section class="flex-between">
         <input-number-pre v-model="form.width" preStr="W" />
@@ -13,12 +13,12 @@
         <input-number-pre v-model="form.y" preStr="Y" />
       </section>
     </section>
-    <el-collapse v-model="activeName" accordion>
+    <el-collapse v-model="activeName" accordion class="collapse-box">
       <el-collapse-item title="组件配置" name="1">
         <component
-          v-if="form.package?.custom"
+          v-if="configComponent"
           :is="configComponent"
-          v-bind:config="form.package.custom"
+          v-bind:config="form.package.config"
         ></component>
         <div v-else>暂无配置</div>
       </el-collapse-item>
@@ -31,39 +31,24 @@ import inputNumberPre from '@/components/input-number-pre'
 export default {
   name: 'package-info',
   components: { inputNumberPre },
-  computed: {
-    changeForm() {
-      const { currentPackageInfo, showRightPanel } =
-        this.$store.state.pageConfig
-      return {
-        currentPackageInfo,
-        showRightPanel,
-      }
-    },
-  },
+  computed: {},
   watch: {
-    changeForm: {
-      handler(n, o) {
-        if (n?.currentPackageInfo?.key === o?.currentPackageInfo?.key) return
-        const { currentPackageInfo, showRightPanel } = n
-        const show =
-          showRightPanel === 'packageInfo' &&
-          currentPackageInfo &&
-          Object.keys(currentPackageInfo).length
-        if (show) {
-          console.log('currentPackageInfo', currentPackageInfo)
-          this.form = { ...currentPackageInfo }
-          this.configComponent = eval(
-            currentPackageInfo.configComponent.data
-          ).default
-        }
+    form: {
+      handler(n) {
+        this.$emit('update-currPackageInfo', n)
       },
       immediate: true,
       deep: true,
     },
-    form: {
-      handler(n) {
-        this.$sotre.commit('changeCurrPackageInfo', n)
+    '$attrs.packageInfo': {
+      handler(n, o) {
+        if (!n) return
+        this.form = n
+        if (n.key !== o?.key) {
+          this.configComponent = n?.configComponent?.data
+            ? eval(n.configComponent.data).default
+            : ''
+        }
       },
       immediate: true,
       deep: true,
@@ -83,4 +68,8 @@ export default {
   },
 }
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.collapse-box {
+  margin-top: 12px;
+}
+</style>

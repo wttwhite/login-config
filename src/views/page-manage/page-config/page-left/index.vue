@@ -45,7 +45,6 @@ export default {
       }
     },
     dragend(item, e) {
-      console.log('eeeee', e)
       this.$emit('dragend', item, e, this.dragstartEle)
     },
     getDetail() {

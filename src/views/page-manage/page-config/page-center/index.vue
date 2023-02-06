@@ -21,6 +21,12 @@ export default {
         return {}
       },
     },
+    packageInfo: {
+      type: Object,
+      default: () => {
+        return {}
+      },
+    },
   },
   computed: {
     computedRect() {
@@ -33,7 +39,21 @@ export default {
       }
     },
   },
-  watch: {},
+  watch: {
+    packageInfo: {
+      handler(n) {
+        // 向iframe发送数据
+        n.key &&
+          this.$refs.iframeref.contentWindow.postMessage({
+            type: 'change-current-packageInfo',
+            item: {
+              ...JSON.parse(JSON.stringify(n)),
+            },
+          })
+      },
+      deep: true,
+    },
+  },
   data() {
     return {
       list: [],
@@ -59,11 +79,6 @@ export default {
       }
 
       this.list.push({ ...singlePackage }) // 缓存，用于修改值
-      // this.$store.commit('changeCurrPackageInfo', {
-      //   ...singlePackage,
-      //   configComponent: configData,
-      // })
-      // this.$store.commit('changeConfigList', this.list)
       // 向iframe发送数据
       this.$refs.iframeref.contentWindow.postMessage({
         type: 'dragend-single',
@@ -74,6 +89,7 @@ export default {
       this.getIframePackage(event)
       this.getIframeShowPanel(event)
     },
+    // 获取拖拽之后的数据
     getIframePackage(event) {
       const { type, data } = event.data
       if (type !== 'changeCurrPackageInfoMessage' || !data) return
@@ -88,20 +104,20 @@ export default {
           }
           packageInfo = params
           this.$set(this.list, index, params)
-          console.log('this.listthis.listthis.list', this.list)
-          this.$store.commit('changeConfigList', this.list)
-          this.$store.commit('changeCurrPackageInfo', packageInfo)
+          this.$emit('update-allList', this.list)
+          this.$emit('update-currPackageInfo', packageInfo)
         }
       })
     },
+    // 获取组件面板操作显示
     getIframeShowPanel(event) {
       const { type, data } = event.data
-      if (type !== 'changeRightPanel' || !data) return
-      this.$store.commit('changeRightPanel', data)
+      if (type !== 'change-rightPanel' || !data) return
+      this.$emit('update-show-panel', data)
     },
     // 点击页面配置
     pageCenterClick() {
-      this.$store.commit('changeRightPanel', 'pageInfo')
+      this.$emit('update-show-panel', 'pageInfo')
     },
   },
 }

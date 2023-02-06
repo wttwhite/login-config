@@ -15,7 +15,7 @@
         >
           <component
             :is="item.component"
-            :custom="item.package.custom"
+            :config="item.package.config"
           ></component>
         </div>
       </div>
@@ -53,7 +53,6 @@ export default {
   mounted() {
     this.screenResize()
     ResizeObserverIns = new ResizeObserver(() => {
-      console.log('111111')
       this.screenResize()
     })
     ResizeObserverIns.observe(this.$refs.fullScreen)
@@ -76,7 +75,6 @@ export default {
       const jsData = await axios.get(item.js)
       item.component = eval(jsData.data).default
       this.list.push(item)
-      console.log('this.list', this.list)
     },
     screenResize() {
       const originWidth = this.pageInfo.width || 1920

@@ -14,15 +14,15 @@
       @refLineParams="getRefLineParams"
       :debug="false"
       parent
-      @dragging="onDragstop(arguments, item)"
-      @resizing="onResizstop(arguments, item)"
+      @dragstop="onDragstop(arguments, item)"
+      @resizestop="onResizestop(arguments, item)"
       @activated="onActivated(item)"
       @click.native.prevent.stop="onActivated(item)"
       class="vue-draggable-class"
     >
       <component
         :is="item.component"
-        v-bind:custom="item.package.custom"
+        v-bind:config="item.package.config"
       ></component>
     </vue-draggable-resizable>
     <!--辅助线-->
@@ -70,6 +70,10 @@ export default {
   },
   methods: {
     async getFatherData(event) {
+      this.getDragendData(event)
+      this.getRightPackageInfoChange(event)
+    },
+    async getDragendData(event) {
       const { item, type } = event.data
       if (!item || type !== 'dragend-single') return
       const jsData = await axios.get(item.js)
@@ -80,26 +84,39 @@ export default {
       this.list.push(singlePackage)
       this.changeData(singlePackage)
     },
+    getRightPackageInfoChange(event) {
+      const { item, type } = event.data
+      if (!item || type !== 'change-current-packageInfo') return
+      this.list.forEach((listItem, index) => {
+        if (listItem.key === item.key) {
+          this.$set(this.list, index, {
+            ...item,
+            component: listItem.component,
+          })
+        }
+      })
+    },
     changeData(item) {
       const data = { ...item }
       // postMessage不能传dom数据
       delete data.component
-      parent.window.postMessage({ type: 'changeCurrPackageInfoMessage', data })
       parent.window.postMessage({
-        type: 'changeRightPanel',
+        type: 'changeCurrPackageInfoMessage',
+        data: JSON.parse(JSON.stringify(data)),
+      })
+      parent.window.postMessage({
+        type: 'change-rightPanel',
         data: 'packageInfo',
       })
     },
     // 每当组件停止拖动时调用
     onDragstop([x, y], item) {
-      // console.log('onDragstop', x, y, item)
       item.x = x
       item.y = y
       this.changeData(item)
     },
     // 每当组件停止调整大小时调用
-    onResizstop([x, y, width, height], item) {
-      // console.log('onResizstop', x, y, width, height, item)
+    onResizestop([x, y, width, height], item) {
       item.x = x
       item.y = y
       item.width = width
@@ -114,7 +131,7 @@ export default {
     // 点击页面配置
     pageCenterClick() {
       parent.window.postMessage({
-        type: 'changeRightPanel',
+        type: 'change-rightPanel',
         data: 'pageInfo',
       })
     },

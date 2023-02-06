@@ -23,7 +23,7 @@
         >
           <component
             :is="item.js"
-            v-bind:custom="item.package.custom"
+            v-bind:config="item.package.config"
           ></component>
         </vue-draggable-resizable>
         <!--辅助线-->
